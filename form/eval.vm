@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>$!title</title>
+ <meta name = "format-detection" content="telephone = no" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+#LoadCSS("resources/h5/css/reset")
+#LoadCSS("resources/h5/css/eval")
+#LoadJS("resources/h5/js/reponse")
+#LoadJS("resources/h5/js/zepto.min")
+</head>
+<body>
+    <input type="hidden" id="nationval">
+    <input type="hidden" id="purposeval">
+    <input type="hidden" id="assetsval">
+    <input type="hidden" id="backgroundval">
+    <div class="intention">
+        <h2 class="f32">意向国家<span class="f24">（最多选3个）</span></h2>
+        <ul class="clearfix" id="nation">
+        	#foreach($country in $countryList)
+        		<li class="f30" data-value="$!country.countryId">$!country.countryName</li>
+			#end
+        </ul>
+        <div class="line"></div>
+        <h2 class="f32">移民目的<span class="f24">（最多选3个）</span></h2>
+        <ul class="clearfix" id="purpose">
+        	#foreach($mdList in $mdList)
+				 <li class="f30" data-value="$!mdList.mdId">$!mdList.mdName</li>
+			#end
+        </ul>
+        <div class="line" ></div>
+        <h2 class="f32">家庭资产<span class="f24">（单选）</span></h2>
+        <ul class="clearfix singleselection" id="assets">
+        	#foreach($zcList in $zcList)
+				 <li class="f30" data-value="$!zcList.zcId">$!zcList.zcName</li>
+			#end
+        </ul>
+        <div class="line"></div>
+        <h2 class="f32">职业背景<span class="f24">（单选）</span></h2>
+        <ul class="clearfix singleselection" id="background">
+        	#foreach($bjList in $bjList)
+				<li class="f30" data-value="$!bjList.bjId">$!bjList.bjName</li>
+			#end
+        </ul>
+        <div class="line"></div>
+        <!-- <button class="btn f36" id="submitForm" disabled="">联系顾问</button> -->
+        <button class="confirm f34 disabeld" disabled="" id="submitForm">联系顾问</button>
+    </div>
+    <div class="tip f32">最多选择3个</div>
+   <script type="text/javascript">
+   window.jsBbridge=function(callback) {
+              if (window.WebViewJavascriptBridge) {
+                  return callback(WebViewJavascriptBridge);
+              } else {
+                  document.addEventListener(
+                      'WebViewJavascriptBridgeReady',
+                      function() {
+                          callback(WebViewJavascriptBridge)
+                      },
+                      false
+                  );
+              }
+              if (window.WVJBCallbacks) {
+                  return window.WVJBCallbacks.push(callback);
+              }
+              window.WVJBCallbacks = [callback];
+              var WVJBIframe = document.createElement('iframe');
+              WVJBIframe.style.display = 'none';
+              WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+              document.documentElement.appendChild(WVJBIframe);
+              setTimeout(function() {
+                  document.documentElement.removeChild(WVJBIframe)
+              }, 0);
+          };
+    $(function() {
+        $("#nationval,#purposeval,#assetsval,#backgroundval").on('change', function(event) {
+            event.preventDefault();
+            var nationval = $("#nationval").val(),
+                purposeval = $("#purposeval").val(),
+                assetsval = $("#assetsval").val(),
+                backgroundval = $("#backgroundval").val();
+            if (nationval != "" && purposeval != "" && assetsval != "" && backgroundval != "") {
+                $(".confirm").removeClass('disabeld')
+                $(".confirm").removeAttr("disabled");
+               
+            } else {
+                $(".confirm").addClass('disabeld')
+                $(".confirm").attr("disabled",true);
+               
+            }
+        });
+        $("#submitForm").on('click', function(event) {
+            event.preventDefault();
+            var nation=$("#nation").find(".selected"),purpose=$("#purpose").find(".selected"),
+            assetsval=$("#assets").find(".selected").html(),backgroundval=$("#background").find(".selected").html();
+            var nationarr = [],purposerarr=[];
+            $.each(nation, function(index, el) {
+                var lihtml = $(el).html();
+                nationarr.push(lihtml);
+            });
+            nationarr=nationarr.join(',')
+            $.each(purpose, function(index, el) {
+                var lihtml = $(el).html();
+                purposerarr.push(lihtml);
+            });
+             purposerarr=purposerarr.join(',');
+             //jsBbridge调用方法
+                jsBbridge(function(bridge) {
+                    bridge.callHandler(
+                        'sendEvalData', {
+                            mdName:purposerarr,
+                            zcName:assetsval,
+                            countryName:nationarr,
+                            bjName:backgroundval
+                        },
+                         //回调函数
+                        function(responseData) {
+                            console.log(responseData);
+                        }
+                    )
+                })
+        });
+         $("#nation").on('click',"li", function(event) {
+            event.preventDefault();
+            var tem = $(this).is(".selected");
+            var selectedcount =  $("#nation").find('.selected').length;
+            if (!tem) {
+                if (selectedcount <= 2) {
+                    $(this).addClass('selected')
+                } else {
+                    showtip2("最多选择3个国家")
+                }
+                $("#nationval").val(1).change();
+            } else {
+                $(this).removeClass('selected');
+                if( $("#nation").find('.selected').length==0){
+                     $("#nationval").val("").change();
+                }
+               
+            }
+           
+        });
+         $("#purpose").on('click',"li", function(event) {
+            event.preventDefault();
+            var tem = $(this).is(".selected");
+            var selectedcount =  $("#purpose").find('.selected').length;
+            if (!tem) {
+                if (selectedcount <= 2) {
+                    $(this).addClass('selected')
+                } else {
+                    showtip2("最多选择3个目的")
+                }
+             $("#purposeval").val(1).change();
+            } else {
+                $(this).removeClass('selected')
+               if($("#purpose").find('.selected').length==0){
+                   $("#purposeval").val("").change(); 
+                }
+            }
+            
+        });
+         $("#assets").on('click',"li", function(event) {
+            event.preventDefault();
+            $(this).addClass('selected').siblings('li').removeClass('selected')
+            $("#assetsval").val(1).change();
+            
+        });
+         $("#background").on('click',"li", function(event) {
+            event.preventDefault();
+            $(this).addClass('selected').siblings('li').removeClass('selected')
+            $("#backgroundval").val(1).change();
+            
+        });
+
+
+    })
+    </script>
+</body>
+</html>

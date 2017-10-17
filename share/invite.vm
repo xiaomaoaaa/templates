@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>邀请页面</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name = "format-detection" content="telephone = no" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    #LoadCSS("resources/h5/css/reset")
+
+#LoadJS("resources/h5/js/reponse")
+#LoadJS("resources/h5/js/zepto.min")
+    <style type="text/css">
+.con {
+        background: url("$env.getWebURL('resources/h5/images/img_bottom@2x.png')") no-repeat center center;
+        background-size: 100%, auto;
+        width: 100%;
+        padding: 0 0.64rem;
+        padding-top: 0.98rem
+    }
+    
+    .bg1 {
+        background: url("$env.getWebURL('resources/h5/images/img_card@2x.png')") no-repeat center center;
+        background-size: 6.2rem, 9.13rem;
+        width: 6.2rem;
+        height: 9.13rem;
+        padding: 0 0.45rem 1.58rem 0.45rem
+    }
+    
+    .bg2 {
+        background: url("$env.getWebURL('resources/h5/images/img_dialogue@2x.png')") no-repeat center center;
+        background-size: 5.4rem, 3.48rem;
+        width: 5.4rem;
+        height: 3.48rem;
+        color: #6d7d94;
+        padding: 0.9rem 0.32rem 0 0.5rem;
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+    
+    .con h2 {
+        padding-top: 0.88rem;
+        padding-left: 0.92rem;
+        color: #d2b08c;
+        margin-bottom: 0.34rem
+    }
+    
+    .con button {
+        width: 5rem;
+        height: 0.8rem;
+        border-radius: 0.4rem;
+        background: #0b3966;
+        color: #fff;
+        margin: 0.48em auto;
+        display: block;
+        -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .3);
+        box-shadow: 0 3px 9px rgba(0, 0, 0, .3);
+    }
+}
+    </style>
+</head>
+
+<body>
+    <div class="con">
+        <div class="bg1">
+
+            <h2 class="f36">签约用户:$!inviteName</h2>
+            <div class="bg2 f34">
+                邀请您使用新通移民APP，查询移民申请进展和相关信息。
+            </div>
+            <button class="f34" id="applink">接受邀请</button>
+        </div>
+    </div>
+  
+    <script type="text/javascript">
+    $(function() {
+        var clientHeight = document.documentElement.clientHeight;
+        $(".con").height(clientHeight)
+        $("#applink").on('click', function(event) {
+            event.preventDefault();
+            applink();
+        });
+    })
+    function applink() {
+        window.location = 'xtym://platformapi/startapp';
+        var clickedAt = +new Date;
+        setTimeout(function() {
+            !window.document.webkitHidden && setTimeout(function() {
+                if (+new Date - clickedAt < 2000) {
+                    window.location = '$!appDownload';
+                }
+            }, 500);
+        }, 500)
+
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>$!title</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name = "format-detection" content="telephone = no" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    #LoadCSS("resources/h5/css/reset")
+    #LoadJS("resources/h5/js/reponse")
+    <style type="text/css">
+        .con{background: url("$env.getWebURL('resources/h5/images/icon_revoke_gray@2x.png')") no-repeat center;background-size: 100%,100%;width: 1.52rem;height: 1.88rem;margin: 2.88rem auto 0.46rem;}
+        p{color: #848c9a;text-align: center;}
+    </style>
+</head>
+
+<body>
+    <div class="con">
+      
+    </div>
+    <p class="f30">该内容已被撤销</p>
+   
+</body>
+
+</html>

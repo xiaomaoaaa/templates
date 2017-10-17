@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name = "format-detection" content="telephone = no" />
+<title>$!title</title>
+	#LoadCSS("resources/h5/css/reset")
+	#LoadJS("resources/h5/js/reponse")
+<style type="text/css">
+ .con{background: url("$env.getWebURL('resources/h5/images/icon_Refresh@2x.png')") no-repeat center;background-size: 100%,100%;width: 1.3rem;height: 1.3rem;margin: 2.88rem auto 0.46rem;}
+     p{color: #848c9a;text-align: center;}
+</style>
+</head>
+<body>
+	  <div class="con" id="reload" onclick="reload()">
+      
+    </div>
+    <p class="f30">服务器忙，点击刷新</p>
+    
+   <script type="text/javascript">
+        function reload(){
+            document.location.reload()
+        }
+       
+   </script>
+</body>
+</html>

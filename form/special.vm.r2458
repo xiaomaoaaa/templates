@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>$!title</title>
+ <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name = "format-detection" content="telephone = no" />
+#LoadCSS("resources/h5/css/reset")
+#LoadCSS("resources/h5/css/special")
+#LoadJS("resources/h5/js/reponse")
+#LoadJS("resources/h5/js/zepto.min")
+
+</head>
+<body>
+    <div class="banner">
+        <img src="$env.getWebURL('resources/h5/images/banner.jpg')" width="100%" height="100%">
+    </div>
+    <div class="form ">
+        <div class="name clearfix" >
+            <input type="text" placeholder="姓名" name="name" class="f28" id="name" style="height:0.3rem; margin-top: 0.34rem;" >
+            <div class="clean"></div>
+           
+        </div>
+        <div class="phoneNo clearfix">
+            <input type="text" placeholder="联系电话" name="phoneNo" class="f28" id="phoneNo">
+            <div class="clean"></div>
+        </div>
+    </div>
+    <div class="form2">
+        <div class="nation">
+            <input type="hidden" placeholder="意向国家" name="nation" class="f28" id="nation">
+            <p class="f28 init">意向国家</p>
+            <ul id="nationval">
+               
+            </ul>
+            <h3 class="f28">国家项目</h3>
+        </div>
+        <div class="order">
+            <input type="hidden" placeholder="预约" name="order" class="f28" id="order">
+            <p class="f28 init2 ">预约</p>
+            <img src="$env.getWebURL('resources/h5/images/icon_next_blue@2x.png')">
+        </div>
+    </div>
+    <button class="confirm f34 disabeld" disabled="" >预约</button>
+    <!-- <button class="confirm f34 " id="submitOrder">预约</button> -->
+    <div class="bgClass"></div>
+    <div class="nationSelect">
+        <h2 class="f32">意向国家<span class="f24">(最多选择3个)</span><img src="$env.getWebURL('resources/h5/images/icon_close_greyblue@2x.png')" class="close"></h2>
+        <ul class="f30 clearfix">
+        	#foreach($country in $countryList)
+        	 <li data-value="$!country.countryId">$!country.countryName</li>
+			#end
+          
+        </ul>
+        <button class="select f34 disabeld" id="nationconfirm" disabled="">确定</button>
+    </div>
+    <div class="tip f32">最多选择3个</div>
+    <div class="orderTime">
+        <h2 class="f32">预约<img src="$env.getWebURL('resources/h5/images/icon_close_greyblue@2x.png')" class="close"></h2>
+        <div class="time">
+            <dl class="f30 clearfix">
+                <dt class="current" data-value="$nowDate">现在</dt>
+            </dl>
+            <dl class="f30 clearfix">
+                <dt>今天<span></span></dt>
+                <ul class="f28">
+                		#foreach($nowlist in $nowDateList)
+							 <li data-value="$!nowlist.specialDate">$!nowlist.specialDate</li>
+						#end
+                </ul>
+            </dl>
+            <dl class="f30 clearfix">
+                <dt>明天<span></span></dt>
+                <ul class="f28">
+                	#foreach($nextlist in $nextDateList)
+							<li data-value="$!nextlist.specialDate">$!nextlist.specialDate</li>
+						#end
+                </ul>
+            </dl>
+            <dl class="f30 clearfix">
+                <dt data-value="$nextDate">随时</dt>
+            </dl>
+        </div>
+        <button class="select f34" id="orderTimeselect">确定</button>
+    </div>
+    <div class="showClass">
+        <p></p>
+    </div>
+    <script type="text/javascript">
+    window.jsBbridge=function(callback) {
+              if (window.WebViewJavascriptBridge) {
+                  return callback(WebViewJavascriptBridge);
+              } else {
+                  document.addEventListener(
+                      'WebViewJavascriptBridgeReady',
+                      function() {
+                          callback(WebViewJavascriptBridge)
+                      },
+                      false
+                  );
+              }
+              if (window.WVJBCallbacks) {
+                  return window.WVJBCallbacks.push(callback);
+              }
+              window.WVJBCallbacks = [callback];
+              var WVJBIframe = document.createElement('iframe');
+              WVJBIframe.style.display = 'none';
+              WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+              document.documentElement.appendChild(WVJBIframe);
+              setTimeout(function() {
+                  document.documentElement.removeChild(WVJBIframe)
+              }, 0);
+          };
+          
+    $(function() {
+        // 清除姓名和手机表单
+        $(".name,.phoneNo").on('mousedown', ".clean", function(event) {
+            event.preventDefault();
+            $(this).prev("input").val("").change();
+        });
+         //点击国家项目
+        $(".nation").on('mousedown', "h3", function(event) {
+            event.preventDefault();
+            $(".bgClass").show("400");
+            $(".nationSelect").show("400");
+            var temarr = $("#nation").val().split(',');
+            $(".nationSelect").find('.selected').removeClass('selected');
+            var liLists = $(".nationSelect ul").find("li");
+            $.each(liLists, function(index, el) {
+                $.each(temarr, function(index2, el2) {
+                    if ($(el).text()==el2 ){
+                        liLists.eq(index).addClass('selected')
+                    }
+                });
+            });
+
+        });
+         //点击联系电话
+        $(".order").on('click', function(event) {
+            event.preventDefault();
+            $(".bgClass").show("400");
+            $(".orderTime").show("400");
+            if($("#order").val()!=""){
+                 $(".orderTime").find(".current").removeClass('current');
+            }
+            $(".orderTime").find(".selected").removeClass('selected');
+            var curvaldate=$("#order").val().substring(0,2);
+            var curvaltime=$("#order").val().substring(2);
+            var dtarr = $(".time").find('dt'),dttextarr=[];
+            $.each(dtarr,function(index, el) {
+               if($(el).text()==curvaldate){
+                    $(el).addClass('current')
+                    if($(el).next("ul").length>0){
+                       var liLists=$(el).next("ul").find('li');
+                       $.each(liLists,function(index2, el2) {
+                            if($(el2).text()==curvaltime){
+                                 $(el2).addClass('selected')
+                            }
+                       })
+                    }
+               }
+            });
+        });
+        //关闭按钮
+        $(".nationSelect,.orderTime").on('click', '.close', function(event) {
+            event.preventDefault();
+            $(".bgClass").hide("400");
+            $(".nationSelect").hide("400");
+            $(".orderTime").hide("400");
+
+        });
+        $(".bgClass").on('click', function(event) {
+            event.preventDefault();
+            $(".bgClass").hide("400");
+            $(".nationSelect").hide("400");
+            $(".orderTime").hide("400");
+
+        });
+        $("#name,#phoneNo,#nation,#order").on('change', function(event) {
+            event.preventDefault();
+            var nameval = $("#name").val(),
+                phoneNoval = $("#phoneNo").val(),
+                nationval = $("#nation").val(),
+                orderval = $("#order").val();
+            if (nameval != "" && phoneNoval != "" && nationval != "" && orderval != "") {
+                $(".confirm").removeClass('disabeld')
+                 $(".confirm").removeAttr("disabled");
+            } else {
+                $(".confirm").addClass('disabeld')
+                $(".confirm").attr("disabled",true);
+            }
+        });
+        $(".confirm").on('click', function(event) {
+            event.preventDefault();
+            var nametemval = $("#name").val();
+            var namereg = /^[\u4e00-\u9fa5_a-zA-Z\s]+$/;
+              if (!namereg.test(nametemval) ) {
+                showtip2("姓名只支持中英文、空格和下划线");
+                return 
+            }
+            if(nametemval.length > 20){
+            	showtip2("姓名不能超过20个汉字");
+                return 
+            }
+            var phoneNotemval = $("#phoneNo").val();
+            var phoneNoreg = /^1(3|4|5|7|8)\d{9}$/;
+             if (!phoneNoreg.test(phoneNotemval)) {
+                 showtip2("请输入正确的手机号")
+               return
+            }
+            
+            nationval=$("#nation").val();
+            orderval=$("#order").val();
+                //jsBbridge调用方法
+                jsBbridge(function(bridge) {
+                    bridge.callHandler(
+                        'sendData', {
+                            phone:phoneNotemval,
+                            userName:nametemval,
+                            countryName:nationval,
+                            specialDate:orderval
+                        },
+                         //回调函数
+                        function(responseData) {
+                            console.log(responseData);
+                        }
+                    )
+                })
+        });
+        $(".nationSelect").on('click', 'li', function(event) {
+            event.preventDefault();
+            var tem = $(this).is(".selected");
+            var selectedcount = $(".nationSelect").find('.selected').length;
+            if (!tem) {
+                if (selectedcount <= 2) {
+                    $(this).addClass('selected')
+                }else{
+                     showtip2("最多选3个") 
+                }
+
+            } else {
+                $(this).removeClass('selected')
+            }
+            if($(".nationSelect").find('.selected').length==0){
+                $("#nationconfirm").addClass('disabeld');
+                $("#nationconfirm").attr("disabled",true);
+            }else{
+                $("#nationconfirm").removeClass('disabeld')
+                $("#nationconfirm").removeAttr("disabled");
+            }
+        });
+         $(".time").on('click',"dt", function(event) {
+            event.preventDefault();
+            $(this).addClass('current').closest('dl').siblings('dl').find('dt').removeClass('current');
+
+        });
+         $("#nationconfirm").on('click', function(event) {
+             event.preventDefault();
+             var selected=$(".nationSelect").find('.selected');
+             var temarr=[],htmltext="";
+             $.each(selected,function(index, el) {
+                var lihtml=$(el).html();
+                temarr.push(lihtml);
+                htmltext=htmltext+"<li><p class='f28'>"+lihtml+"</p></li>";
+             });
+             $("#nationval").html(htmltext).show();
+
+             $(".nationSelect").hide();
+              $(".bgClass").hide("400");
+              temarr =temarr.join(',');
+             // console.log(typeof temarr)
+             $("#nation").val(temarr).change();
+             $(".init").hide();
+         });
+         $("#orderTimeselect").on('click', function(event) {
+            event.preventDefault();
+            var dthtml = $(".time").find('.current').text(),
+                lihtml = "",
+                ddlenth = $(".time").find('.current').next("ul").length;
+            if (ddlenth) {
+                if ($(".time").find('.current').next("ul").find(".selected").length > 0) {
+                    lihtml = $(".time").find('.current').next("ul").find(".selected").html();
+                } else {
+                    showtip2("请选择时间段");
+                    return
+                }
+            } else {
+                lihtml = ""
+            }
+            $(".init2").html("<span class='f28'>"+dthtml+"</span><span class='f28'>"+lihtml+"</span>")
+            $("#order").val(dthtml+lihtml).change()
+            $(".orderTime").hide();
+             $(".bgClass").hide();
+        });
+        $(".time").on('click', 'li', function(event) {
+            event.preventDefault();
+            $(this).addClass('selected').siblings('li').removeClass('selected')
+                .closest('dl').siblings('dl').find('.selected').removeClass('selected')
+        });
+
+    })
+    
+ 
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name = "format-detection" content="telephone = no" />
+<title>$!title</title>
+#LoadCSS("resources/h5/css/reset")
+#LoadCSS("resources/h5/css/project")
+#LoadJS("resources/h5/js/reponse")
+#LoadJS("resources/h5/js/zepto.min")
+</head>
+<body>
+#Hidden("share", "$!share")
+ <div class="top clearfix">
+        <div class="f28">
+            <div class="closebanner"></div>
+            <div class="text">
+                <p class="f28">新通移民</p>
+                <p class="f24">上新通移民体验更多精彩内容</p>
+            </div> 
+        </div>
+        <div>
+            <button class="f28" id="applink">打开APP</button>
+        </div>
+    </div>
+ <div class="banner">
+        <img src="$env.getWebURL('resources/h5/images/banner.jpg')" width="100%" height="100%">
+         <img src="$env.getWebURL('resources/h5/images/banner.jpg')" width="100%" height="100%">
+          <img src="$env.getWebURL('resources/h5/images/banner.jpg')" width="100%" height="100%">
+    </div>
+ $!content
+ <script type="text/javascript">
+ $(function(){
+ 	 	 if("$!share"==1){
+            $(".top").show();
+            $(".banner").css({
+        		marginTop:1.2+ 'rem',
+        	});
+        }else{
+             $(".top").hide();
+             $(".banner").css({
+        		marginTop: '0',
+        	});
+        }
+         $("#applink").on('click', function(event) {
+            event.preventDefault();
+            applink();
+        });
+ })
+   function applink() {
+        window.location = 'xtym://platformapi/startapp';
+        var clickedAt = +new Date;
+        setTimeout(function() {
+            !window.document.webkitHidden && setTimeout(function() {
+                if (+new Date - clickedAt < 2000) {
+                    window.location = '$!appDownload';
+                }
+            }, 500);
+        }, 500)
+
+    }
+ </script>
+</body>
+</html>

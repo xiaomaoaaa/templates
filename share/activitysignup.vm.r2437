@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>$!title</title>
+#LoadCSS("resources/h5/css/reset")
+#LoadJS("resources/h5/js/reponse")
+#LoadJS("resources/h5/js/zepto.min")
+<style type="text/css">
+    .form {
+        background: #fff;
+        height: 4rem;
+    }
+    
+    .form input {
+        display: block;
+        height: 1rem;
+        width: 5.6rem;
+        color: #333;
+        float: left;
+        border-bottom: 1px solid #d8d8d8; margin-left: 1rem;
+    }
+    
+    .form input#code {
+        width: 3.9rem;
+    }
+     .form .code input{border:none;}  
+    .form .name,
+    .form .phoneNo,
+    .peoples,
+    .code {
+        position: relative;
+        height: 1rem;
+    }
+    /*.form .name{border-bottom: 1px solid #d8d8d8;}*/
+    
+    .form .clean {
+        float: right;
+        width: 0.9rem;
+        height: 1rem;
+        background: url("$env.getWebURL('resources/h5/images/icon_close_gray@2x.png')") no-repeat 0.3rem center;
+        background-size: 0.3rem;
+        border-bottom: 1px solid #d8d8d8;
+    }
+    
+    #btn {
+        display: block;
+        float: right;
+        width: 2.6rem;
+        height: 1rem;
+       
+        border-left: 1px solid #d8d8d8;
+        background: none;
+        color: #0b3966;
+        margin-left: 0;
+    }
+    .form input#people{
+        width: 7.5rem;margin-left: 0;
+         background: url("$env.getWebURL('resources/h5/images/icon_man_gray.png')") no-repeat 0.32rem center;padding-left: 1.02rem;
+        background-size: 0.36rem;
+         border-top: 1px solid #d8d8d8;
+    }
+    .confirm {
+        width: 6.54rem;
+        border-radius: 0.08rem;
+        height: 0.8rem;
+        background: #0a3965;
+        color: #fff;
+        margin: 1.3rem auto 0;
+        display: block;
+    }
+    
+    .confirm.disabeld {
+        background: #ccc;
+    }
+      .banner {
+         height: 1.5rem;
+         width: 100%;
+         background: url("$env.getWebURL('resources/h5/images/img_activity@2x.png')") no-repeat left center;
+        background-size: 100% 1.5rem;
+        text-align: center;line-height: 1.5rem;color:#fff;
+     }
+</style>
+</head>
+<body>
+#Hidden("activityId", "$!activityId")
+    <div class="banner f34">
+       $!title
+    </div>
+    <div class="form">
+        <div class="name">
+            <input type="text" placeholder="姓名" name="name" class="f28" id="name">
+            <div class="clean"></div>
+        </div>
+        <div class="phoneNo">
+            <input type="text" placeholder="联系电话" name="phoneNo" class="f28" id="phoneNo">
+            <div class="clean"></div>
+        </div>
+        <div class="code">
+            <input type="text" placeholder="验证码" name="code" class="f28" id="code" />
+            <input type="button" id="btn" value="发送验证码" class="f28" />
+        </div>
+        <div class="peoples">
+            <input type="text" placeholder="报名人数" name="people" class="f28" id="people">
+        </div>
+        <button class="confirm disabeld">报名</button>
+    </div>
+    <div class="tip f32">最多选择3个</div>
+  
+    <script type="text/javascript">
+    $(function() {
+
+        // 清除姓名和手机表单
+        $(".name,.phoneNo").on('mousedown', ".clean", function(event) {
+            event.preventDefault();
+            $(this).prev("input").val("");
+        });
+        $("#name,#phoneNo,#people,#code").on('change', function(event) {
+            event.preventDefault();
+            var nameval = $("#name").val(),
+                phoneNoval = $("#phoneNo").val(),
+                peopleval = $("#people").val(),
+                codeval = $("#code").val();
+            if (nameval != "" && phoneNoval != "" && peopleval != "" && codeval != "") {
+                $(".confirm").removeClass('disabeld')
+                $(".confirm").removeAttr("disabled");
+
+            } else {
+                $(".confirm").addClass('disabeld')
+                $(".confirm").attr("disabled", true);
+
+            }
+        });
+       
+        $(".confirm").on('click', function(event) {
+            event.preventDefault();
+            var nametemval = $("#name").val();
+            var namereg = /^[\u4e00-\u9fa5_a-zA-Z\s]+$/;
+            if (!namereg.test(nametemval) || nametemval.length > 20) {
+                // showtip("姓名只支持中英文、空格和下划线。不能超过20个汉字")；
+                showtip2("姓名格式错误")
+                return 
+            }
+            var phoneNotemval = $("#phoneNo").val();
+            var phoneNoreg = /^1(3|4|5|7|8)\d{9}$/;
+            if (!phoneNoreg.test(phoneNotemval)) {
+                showtip2("手机格式错误")
+                return 
+            }
+            var peoples=$("#people").val();
+             if (peoples > 99) {
+                // showtip("姓名只支持中英文、空格和下划线。不能超过20个汉字")；
+                showtip2("报名人数过多")
+                return 
+            }
+          
+            $.ajax({
+                type: 'GET',
+                url: "$env.getWebURL('/ym/appspecial/addactivityhtml.do')",
+                dataType: 'json',
+                data: {
+                    'phoneNo': $("#phoneNo").val(),
+                    'userName': $("#name").val(),
+                    'userCount': $("#people").val(),
+                    'code': $("#code").val(),
+                    'activityId': "$!activityId",
+                },
+                contentType: 'application/json',
+                success: function(data) {
+                    if (data.rc == 0) {
+                        console.log(data)
+                    } else {
+                       showtip2(data.msg)
+                    }
+
+                }
+            });
+        });
+        $("#btn").on('click', function(event) {
+            event.preventDefault();
+            var reg = /^1(3|4|5|7|8)\d{9}$/;
+            if (!reg.test($("#phoneNo").val())) {
+                showtip2("请输入正确手机号")
+                return ;
+            }
+            var countdown = 60;
+            var _this = $(this);
+            //设置button效果，开始计时  
+            _this.attr("disabled", "true");
+            _this.val("重新发送"+countdown + "(s)");
+            //启动计时器，1秒执行一次  
+            var timer = setInterval(function() {
+                if (countdown == 0) {
+                    clearInterval(timer); //停止计时器  
+                    _this.removeAttr("disabled"); //启用按钮  
+                    _this.val("重新发送");
+                } else {
+                    countdown--;
+                    _this.val("重新发送"+countdown + "(s)");
+                }
+            }, 1000);
+            $.ajax({
+                type: 'GET',
+                url: "$env.getWebURL('/ym/appUser/sendSms/login')",
+                dataType: 'json',
+                data: {
+                    'phoneNo': $("#phoneNo").val(),
+                },
+                contentType: 'application/json',
+                success: function(data) {
+                  if(rc==0){
+                    console.log(data)
+                  }else{
+                    showtip2(data.msg)
+                  }
+                }
+            });
+        });
+
+    })
+
+    </script>
+
+</body>
+</html>
